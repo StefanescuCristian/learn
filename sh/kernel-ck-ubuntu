@@ -33,7 +33,7 @@ vbfq=v5r1
 #patch ck
 patchck=3.7-ck1
 #sufixo
-ckk=ck1-big-bum
+ckk=ck1
 #arch
 arqt=$(dpkg --print-architecture)
 #####################################
@@ -237,8 +237,8 @@ test_root
 echo -e "\033[1m--------------------------------\033[7m Fixing dependencies \033[0m\033[1m--------------------------------\033[0m"
 
 ########baixando compiladores e dependencias########################################################
-echo "$sudopwd" | _exec $SUDO apt-get update
-echo "$sudopwd" | _exec $SUDO apt-get install kernel-package gcc-4.6 libncurses5 libncurses5-dev build-essential patch fakeroot -y
+echo "$sudopwd" | _exec $SUDO apt-fast update
+echo "$sudopwd" | _exec $SUDO apt-fast install kernel-package gcc-4.6 libncurses5 libncurses5-dev build-essential patch fakeroot -y
 _exec echo
 ####################################################################################################
 
@@ -325,9 +325,9 @@ mv tmp .config
 ##make localmodconfig
 #mv config_strip .config
 
-#echo "[+] running menuconfig ...    "
-#make menuconfig
-#_exec echo
+echo "[+] running menuconfig ...    "
+make menuconfig
+_exec echo
 
 echo -e "\033[1m-----------------------------\033[7m Compiling the kernel \033[0m\033[1m------------------------------\033[0m"
 
