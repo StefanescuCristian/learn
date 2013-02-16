@@ -25,15 +25,15 @@
 # 3.7
 #versão do kernel a ser compilado
 kernel=3.7
-#patch de atualização
-patchkernel=3.7.6
+#path de atualização
+patchkernel=3.7.8
 #patch BFQ
 bfq=3.7.0-v5r1
 vbfq=v5r1
 #patch ck
 patchck=3.7-ck1
 #sufixo
-ckk=ck1
+ckk=ck1-big-bum
 #arch
 arqt=$(dpkg --print-architecture)
 #####################################
@@ -80,7 +80,7 @@ tmp_path="$HOME/.tmp/kernel-ck-ubuntu-$patchkernel"
 curr_path=$PWD
 #arquitetura: amd64 ou i386 # criado por Stivekx - forum ubuntu-br #######
 #CL=CONCURRENCY_LEVEL do processador # criado por Stivekx  ############
-CL=$(grep -c processor /proc/cpuinfo)
+#CL=$(grep -c processor /proc/cpuinfo)
 
 trap cleanup SIGINT SIGTERM #trap ctrl-c
 
@@ -292,9 +292,11 @@ echo -e "\033[1m-----------------------------\033[7m Configuring the kernel \033
 #### criado por Stivekx #############
 #config_file=$(locate /boot/config-* | sort -r | head -1)
 
-echo "[+] downloading an optimized config file from http://liquorix.net ...    "
-_exec wget "http://liquorix.net/sources/$kernel/config.$arqt"
-_exec cp config.$arqt .config
+#echo "[+] downloading an optimized config file from http://liquorix.net ...    "
+#_exec wget "http://liquorix.net/sources/$kernel/config.$arqt"
+#_exec cp config.$arqt .config
+echo "[+] using local config"
+_exec cp $HOME/.config_me .config
 
 #tmp fix for bug #663474
 #http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=663474
@@ -325,12 +327,12 @@ mv tmp .config
 
 #echo "[+] running menuconfig ...    "
 #make menuconfig
-_exec echo
+#_exec echo
 
 echo -e "\033[1m-----------------------------\033[7m Compiling the kernel \033[0m\033[1m------------------------------\033[0m"
 
 echo "[+] running make-kpkg ...    "
-CONCURRENCY_LEVEL=$CL
+#CONCURRENCY_LEVEL=$CL
 echo | _exec fakeroot make-kpkg --initrd kernel_image kernel_headers modules_image
 _exec echo
 
