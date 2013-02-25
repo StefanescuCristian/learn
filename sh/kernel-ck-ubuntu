@@ -27,9 +27,10 @@
 kernel=3.7
 #path de atualização
 patchkernel=3.7.9
+old_kernel=3.7.8
 #patch BFQ
-bfq=3.7.0-v5r1
-vbfq=v5r1
+bfq=3.7.0-v6
+vbfq=v6
 #patch ck
 patchck=3.7-ck1
 #sufixo
@@ -78,6 +79,8 @@ arqt=$(dpkg --print-architecture)
 # people should use a partition with the exec option set, the /tmp partitions usually have noexec
 tmp_path="$HOME/.tmp/kernel-ck-ubuntu-$patchkernel" 
 curr_path=$PWD
+online="$HOME/Ubuntu One/kernel-ck/$patchkernel"
+ubuntu_one_home="$HOME/Ubuntu One/kernel-ck"
 #arquitetura: amd64 ou i386 # criado por Stivekx - forum ubuntu-br #######
 #CL=CONCURRENCY_LEVEL do processador # criado por Stivekx  ############
 #CL=$(grep -c processor /proc/cpuinfo)
@@ -231,6 +234,20 @@ function _waitfor ()
     fi
 }
 
+function publish()
+{
+	mkdir "$online"
+	cp -v $HOME/linux-*.deb "$online"
+	sleep 300
+	echo "[+] waiting debs files to sync ... "
+	python2 ~/Downloads/u1-publish-folder "$online"
+	cp "$online/u1-folder-index.html" "$ubuntu_one_home/$patchkernel-ck.html"
+	sleep 30
+	echo "[+] waiting html files to sync ... "
+	python2 ~/Downloads/u1-publish-folder "$ubuntu_one_home"
+
+}
+
 header
 test_root
 
@@ -295,8 +312,9 @@ echo -e "\033[1m-----------------------------\033[7m Configuring the kernel \033
 #echo "[+] downloading an optimized config file from http://liquorix.net ...    "
 #_exec wget "http://liquorix.net/sources/$kernel/config.$arqt"
 #_exec cp config.$arqt .config
-echo "[+] using local config"
-_exec cp $HOME/.config_me .config
+
+echo "[+] using ubuntu config"
+_exec cp $HOME/.config_ubuntu .config
 
 #tmp fix for bug #663474
 #http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=663474
@@ -314,11 +332,11 @@ fi
 #thanks StefanescuCristian: https://github.com/chilicuil/learn/commit/c2d44556101f997d70eac4c5536ea241363ee63c#commitcomment-2390064
 echo "[+] making sure BFS and BFQ are enabled in config"
 sed "/CONFIG_SCHED_CFS=y/d" .config > tmp
-mv tmp .config
+mv -f tmp .config
 sed "s/# CONFIG_SCHED_BFS is not set/CONFIG_SCHED_BFS=y/g" .config > tmp
-mv tmp .config
+mv -f tmp .config
 sed "s/# CONFIG_IOSCHED_BFQ is not set/CONFIG_IOSCHED_BFQ=y/g" .config > tmp
-mv tmp .config
+mv -f tmp .config
 
 #echo "[+] optimizying even more, using streamline_config.pl ...    "
 #chmod +x ./scripts/kconfig/streamline_config.pl && ./scripts/kconfig/streamline_config.pl > config_strip
@@ -326,8 +344,8 @@ mv tmp .config
 #mv config_strip .config
 
 #echo "[+] running menuconfig ...    "
-#make menuconfig
-#_exec echo
+make menuconfig
+_exec echo
 
 echo -e "\033[1m-----------------------------\033[7m Compiling the kernel \033[0m\033[1m------------------------------\033[0m"
 
@@ -339,8 +357,11 @@ _exec echo
 echo -e "\033[1m-------------------------------------\033[7m DONE \033[0m\033[1m----------------------------------\033[0m"
 echo "[+] copying the debs files ..."
 _exec cp -v ../linux-*.deb $curr_path
+echo "[+] publishing to Ubuntu One ..."
+publish
 echo "[+] you may want to install the generated packages and reboot your system, run: $ sudo dpkg -i linux-*.deb"
 echo "[+] have fun ^_^!"
+
 
 #echo "$sudopwd" | $SUDO dpkg -i ../*.deb
 
