@@ -26,7 +26,7 @@
 #versão do kernel a ser compilado
 kernel=3.7
 #path de atualização
-patchkernel=3.7.9
+patchkernel=3.7.10
 old_kernel=3.7.8
 #patch BFQ
 bfq=3.7.0-v6
@@ -344,8 +344,8 @@ mv -f tmp .config
 #mv config_strip .config
 
 #echo "[+] running menuconfig ...    "
-make menuconfig
-_exec echo
+#make menuconfig
+#_exec echo
 
 echo -e "\033[1m-----------------------------\033[7m Compiling the kernel \033[0m\033[1m------------------------------\033[0m"
 
